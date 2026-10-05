@@ -24,16 +24,13 @@ Token goes in env var `NETLIFY_TOKEN` — never in files or git. The old token w
 - Refresh no longer logs you out (AuthContext reads session synchronously)
 - Tailwind safelist for runtime color classes
 
-## Written locally, NOT yet confirmed live (last deploy was interrupted)
-"Make the demo fully clickable":
-- `src/pages/InfoPage.tsx` — about, careers, blog, press, help, terms, privacy, contact, forgot-password
-- `src/pages/SectionPage.tsx` — /creator/bookings, /provider/reviews, /brand/{campaigns,creators,analytics,billing}, /cc-tv/schedule, and a real 404
-- `App.tsx` — routes for the above, ScrollToTop, DemoButtonFeedback (buttons with no handler show a "Preview" toast)
-- Landing footer links now real; one-click demo login buttons (Creator/Provider/Brand) on `/login`; booking form submits
-- Next: build, deploy, run `C:\Users\samaa\AppData\Local\Temp\cc_link_check.py` (expects `LINK_CHECK=PASS`)
+## Verified 2026-10-05
+- InfoPage / SectionPage / demo login buttons / footer links deployed (deploy `6ac4084887af0e5ef11ce2f4`)
+- `C:\Users\samaa\AppData\Local\Temp\cc_link_check.py` → 51 pages, `LINK_CHECK=PASS`
+- Redeploy any time: `bash C:/Users/samaa/AppData/Local/Temp/cc_deploy.sh` (reads NETLIFY_TOKEN, prints DEPLOY_STATE + live-vs-local bundle match)
 
 ## Open items
 - creatorclap.com still points at a Squarespace parking page — repoint DNS to Netlify
-- No GitHub repo yet; create `originaonxi/creator-clap` and link Netlify for auto-deploy
+- GitHub: https://github.com/originaonxi/creator-clap (public). Netlify not yet linked — Netlify → creatorclap → Site configuration → Build & deploy → Link repository
 - `gh`: a stale `GH_TOKEN` env var breaks auth — use `env -u GH_TOKEN gh ...`
 - AI / Buy / Sell / Withdraw are demos (no backend, no payments)

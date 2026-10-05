@@ -1,8 +1,8 @@
 name: Deploy to GitHub Pages
 
+# Netlify is the live host. This GitHub Pages build is manual-only (Actions → Run workflow)
+# and needs Settings → Pages → Source: "GitHub Actions" enabled first.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
