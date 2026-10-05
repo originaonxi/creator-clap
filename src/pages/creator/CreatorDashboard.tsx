@@ -20,7 +20,8 @@ import {
   BarChart3,
   ArrowRight,
   Palette,
-  ShoppingBag
+  ShoppingBag,
+  Scissors
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -105,7 +106,7 @@ const CreatorDashboard = () => {
     }
   ];
 
-  // Order requested by the team: Book → Mood Board → Sell & Earn → Campaigns → Withdraw
+  // Order requested by the team: Book → CreatorClap Edits → Mood Board → Sell & Earn → Campaigns → Withdraw
   const quickActions = [
     {
       title: 'Book Services',
@@ -113,6 +114,13 @@ const CreatorDashboard = () => {
       icon: Calendar,
       color: 'purple',
       link: '/creator/book'
+    },
+    {
+      title: 'CreatorClap Edits',
+      subtitle: 'Pro edits by our in-house team',
+      icon: Scissors,
+      color: 'red',
+      link: '/creator/edits'
     },
     {
       title: 'Mood Board',
@@ -160,6 +168,7 @@ const CreatorDashboard = () => {
             {[
               { icon: BarChart3, label: 'Dashboard', to: '/creator/dashboard', active: true },
               { icon: Calendar, label: 'Book Services', to: '/creator/book' },
+              { icon: Scissors, label: 'CreatorClap Edits', to: '/creator/edits' },
               { icon: Palette, label: 'Mood Board', to: '/creator/mood-board' },
               { icon: ShoppingBag, label: 'Sell & Earn', to: '/creator/sell' },
               { icon: Megaphone, label: 'Campaigns', to: '/creator/campaigns' },
@@ -242,7 +251,7 @@ const CreatorDashboard = () => {
         {/* Dashboard Content */}
         <main className="flex-1 p-4 lg:p-8">
           {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {quickActions.map((action, index) => (
               <Link
                 key={index}

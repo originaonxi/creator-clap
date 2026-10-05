@@ -28,6 +28,8 @@ Token goes in env var `NETLIFY_TOKEN` — never in files or git. The old token w
 - InfoPage / SectionPage / demo login buttons / footer links deployed (deploy `6ac4084887af0e5ef11ce2f4`)
 - `C:\Users\samaa\AppData\Local\Temp\cc_link_check.py` → 51 pages, `LINK_CHECK=PASS`
 - Redeploy any time: `bash C:/Users/samaa/AppData/Local/Temp/cc_deploy.sh` (reads NETLIFY_TOKEN, prints DEPLOY_STATE + live-vs-local bundle match)
+- Sell & Earn: no Headings; Templates = Attach Template or Use Template (6 ready templates). Test: `cc_sell_check.py`
+- CreatorClap Edits `/creator/edits` (packages, footage upload, style, delivery, order list), card right after Book Services. Test: `cc_edits_check.py`
 
 ## Open items
 - creatorclap.com still points at a Squarespace parking page — repoint DNS to Netlify

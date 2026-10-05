@@ -7,6 +7,7 @@ import CreatorDashboard from './pages/creator/CreatorDashboard';
 import BookServicePage from './pages/creator/BookServicePage';
 import MoodBoardPage from './pages/creator/MoodBoardPage';
 import SellEarnPage from './pages/creator/SellEarnPage';
+import CreatorClapEditsPage from './pages/creator/CreatorClapEditsPage';
 import CampaignsPage from './pages/creator/CampaignsPage';
 import EarningsPage from './pages/creator/EarningsPage';
 import ProviderDashboard from './pages/provider/ProviderDashboard';
@@ -86,6 +87,10 @@ function AppRoutes() {
       <Route 
         path="/creator/mood-board" 
         element={isAuthenticated && user?.userType === 'creator' ? <MoodBoardPage /> : <Navigate to="/login" />} 
+      />
+      <Route
+        path="/creator/edits"
+        element={isAuthenticated && user?.userType === 'creator' ? <CreatorClapEditsPage /> : <Navigate to="/login" />}
       />
       <Route 
         path="/creator/sell" 

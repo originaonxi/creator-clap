@@ -17,7 +17,7 @@ import {
   IndianRupee,
   Eye,
   Sparkles,
-  Link2
+  Check
 } from 'lucide-react';
 import { useNotifications } from '../../contexts/NotificationContext';
 
@@ -25,10 +25,9 @@ interface Submission {
   id: string;
   category: string;
   tagline: string;
-  headings: string;
+  usedTemplate?: string;
   captions: string;
   template?: { name: string; size: number };
-  templateLink: string;
   hashtags: string[];
   price: number;
   submittedAt: string;
@@ -50,7 +49,16 @@ const CONTENT_CATEGORIES = [
 ];
 
 const STORAGE_KEY = 'sellEarn.submissions';
-const EMPTY_FORM = { category: '', tagline: '', headings: '', captions: '', templateLink: '', hashtags: '', price: '' };
+const EMPTY_FORM = { category: '', tagline: '', captions: '', hashtags: '', price: '' };
+
+const READY_TEMPLATES = [
+  { name: 'Viral Hook Reel', desc: '3-sec hook, fast cuts, bold captions', emoji: '⚡' },
+  { name: 'Day in My Life', desc: 'Time-stamped scenes, soft transitions', emoji: '🌅' },
+  { name: 'Product Review', desc: 'Unbox → test → verdict', emoji: '📦' },
+  { name: 'Before / After', desc: 'Beat-synced split reveal', emoji: '✨' },
+  { name: 'Tutorial in 5 Steps', desc: 'Numbered steps, on-screen text', emoji: '🎓' },
+  { name: 'Trend Remix', desc: 'Matches a trending audio', emoji: '🔥' }
+];
 const MAX_TEMPLATE_MB = 200;
 const TAGLINE_MAX = 120;
 const CAPTION_MAX = 2200; // Instagram caption limit
@@ -67,6 +75,7 @@ const SellEarnPage = () => {
   });
   const [form, setForm] = useState(EMPTY_FORM);
   const [templateFile, setTemplateFile] = useState<File | null>(null);
+  const [usedTemplate, setUsedTemplate] = useState('');
   const [dragging, setDragging] = useState(false);
   const [justSubmitted, setJustSubmitted] = useState(false);
 
@@ -75,15 +84,12 @@ const SellEarnPage = () => {
   // "travel, #reels  fashion" → ["#travel", "#reels", "#fashion"], de-duplicated
   const hashtags = useMemo(
     () =>
-      Array.from(
-        new Set(
-          form.hashtags
-            .split(/[\s,]+/)
-            .map(t => t.replace(/^#+/, '').trim())
-            .filter(Boolean)
-            .map(t => `#${t}`)
-        )
-      ),
+      form.hashtags
+        .split(/[\s,]+/)
+        .map(t => t.replace(/^#+/, '').trim())
+        .filter(Boolean)
+        .map(t => `#${t}`)
+        .filter((t, i, all) => all.indexOf(t) === i),
     [form.hashtags]
   );
 
@@ -104,8 +110,8 @@ const SellEarnPage = () => {
     if (fileInput.current) fileInput.current.value = '';
   };
 
-  const hasIdea = Boolean(form.tagline.trim() || form.headings.trim() || form.captions.trim());
-  const hasTemplate = Boolean(templateFile || form.templateLink.trim());
+  const hasIdea = Boolean(form.tagline.trim() || form.captions.trim());
+  const hasTemplate = Boolean(templateFile || usedTemplate);
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
@@ -122,10 +128,9 @@ const SellEarnPage = () => {
         id: Date.now().toString(),
         category: form.category,
         tagline: form.tagline.trim(),
-        headings: form.headings.trim(),
         captions: form.captions.trim(),
         template: templateFile ? { name: templateFile.name, size: templateFile.size } : undefined,
-        templateLink: form.templateLink.trim(),
+        usedTemplate: usedTemplate || undefined,
         hashtags,
         price: Number(form.price) || 0,
         submittedAt: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
@@ -134,6 +139,7 @@ const SellEarnPage = () => {
     ]);
     setForm(EMPTY_FORM);
     removeFile();
+    setUsedTemplate('');
     setJustSubmitted(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     addNotification({ type: 'success', title: 'Submitted!', message: 'Your work is in review and will be listed in the Creator Marketplace.' });
@@ -200,7 +206,7 @@ const SellEarnPage = () => {
                 <span className="w-10 h-10 rounded-xl bg-yellow-100 text-yellow-700 flex items-center justify-center font-bold">1</span>
                 <div>
                   <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2"><Lightbulb className="w-5 h-5 text-yellow-500" /> Content Ideas</h2>
-                  <p className="text-sm text-gray-500">Select a category, then write your tagline, headings and captions.</p>
+                  <p className="text-sm text-gray-500">Select a category, then write your tagline and captions.</p>
                 </div>
               </div>
 
@@ -240,17 +246,6 @@ const SellEarnPage = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="headings" className="block text-sm font-semibold text-gray-700 mb-2">Headings</label>
-                  <textarea
-                    id="headings"
-                    value={form.headings}
-                    onChange={update('headings')}
-                    rows={3}
-                    placeholder={'One heading per line\n3 mistakes killing your reach\nThe 5-minute morning routine'}
-                    className={inputClass}
-                  />
-                </div>
-                <div>
                   <div className="flex items-center justify-between mb-2">
                     <label htmlFor="captions" className="text-sm font-semibold text-gray-700">Captions</label>
                     <span className="text-xs text-gray-400">{form.captions.length}/{CAPTION_MAX}</span>
@@ -274,7 +269,7 @@ const SellEarnPage = () => {
                 <span className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold">2</span>
                 <div>
                   <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2"><LayoutTemplate className="w-5 h-5 text-purple-600" /> Templates</h2>
-                  <p className="text-sm text-gray-500">Attach Template — CapCut, Premiere Pro, After Effects, Canva, video or .zip.</p>
+                  <p className="text-sm text-gray-500">Attach your own template, or use a ready-made CreatorClap template.</p>
                 </div>
               </div>
 
@@ -325,14 +320,38 @@ const SellEarnPage = () => {
                 onChange={e => acceptFile(e.target.files?.[0])}
               />
 
-              <div className="mt-4 relative">
-                <Link2 className="w-4 h-4 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                <input
-                  value={form.templateLink}
-                  onChange={update('templateLink')}
-                  placeholder="or paste a template link (CapCut / Canva / Drive)"
-                  className={`${inputClass} pl-11`}
-                />
+              <div className="flex items-center gap-3 my-6">
+                <span className="flex-1 h-px bg-gray-200" />
+                <span className="text-sm font-semibold text-gray-500">or Use Template</span>
+                <span className="flex-1 h-px bg-gray-200" />
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {READY_TEMPLATES.map(t => {
+                  const selected = usedTemplate === t.name;
+                  return (
+                    <button
+                      key={t.name}
+                      type="button"
+                      onClick={() => setUsedTemplate(selected ? '' : t.name)}
+                      aria-pressed={selected}
+                      className={`relative text-left p-4 rounded-xl border transition ${
+                        selected ? 'border-purple-500 bg-purple-50 ring-2 ring-purple-200' : 'border-gray-200 bg-white hover:border-purple-300 hover:shadow-sm'
+                      }`}
+                    >
+                      {selected && (
+                        <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-purple-600 text-white flex items-center justify-center">
+                          <Check className="w-3 h-3" />
+                        </span>
+                      )}
+                      <span className="text-2xl">{t.emoji}</span>
+                      <p className="font-semibold text-gray-900 mt-1">{t.name}</p>
+                      <p className="text-xs text-gray-500">{t.desc}</p>
+                      <span className={`mt-2 inline-block text-xs font-semibold ${selected ? 'text-purple-700' : 'text-gray-400'}`}>
+                        {selected ? 'Using this template' : 'Use template'}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </section>
 
@@ -392,14 +411,9 @@ const SellEarnPage = () => {
                   {selectedCategory ? `${selectedCategory.emoji} ${selectedCategory.id}` : 'Choose a category'}
                 </span>
                 <p className={`text-lg font-bold ${form.tagline ? 'text-gray-900' : 'text-gray-300'}`}>{form.tagline || 'Your tagline appears here'}</p>
-                {form.headings.trim() && (
-                  <ul className="text-sm text-gray-700 list-disc pl-5 space-y-0.5">
-                    {form.headings.trim().split('\n').filter(Boolean).slice(0, 3).map((h, i) => <li key={i}>{h}</li>)}
-                  </ul>
-                )}
                 {form.captions.trim() && <p className="text-sm text-gray-600 line-clamp-3">{form.captions}</p>}
-                {(templateFile || form.templateLink.trim()) && (
-                  <p className="text-sm text-gray-700 flex items-center gap-1"><LayoutTemplate className="w-4 h-4 text-purple-600" /> {templateFile ? templateFile.name : 'Template link included'}</p>
+                {(templateFile || usedTemplate) && (
+                  <p className="text-sm text-gray-700 flex items-center gap-1"><LayoutTemplate className="w-4 h-4 text-purple-600" /> {[templateFile?.name, usedTemplate].filter(Boolean).join(' + ')}</p>
                 )}
                 {hashtags.length > 0 && <p className="text-sm text-blue-700">{hashtags.slice(0, 6).join(' ')}{hashtags.length > 6 ? ` +${hashtags.length - 6}` : ''}</p>}
                 <p className="text-xl font-extrabold text-green-600">{Number(form.price) > 0 ? `₹${Number(form.price).toLocaleString('en-IN')}` : 'Free / set price'}</p>
@@ -441,10 +455,10 @@ const SellEarnPage = () => {
                       </button>
                     </div>
                   </div>
-                  <p className="font-semibold text-gray-900">{s.tagline || s.headings.split('\n')[0] || 'Untitled submission'}</p>
+                  <p className="font-semibold text-gray-900">{s.tagline || s.captions.slice(0, 60) || 'Untitled submission'}</p>
                   <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
-                    {(s.tagline || s.headings || s.captions) && <span className="flex items-center gap-1"><Lightbulb className="w-4 h-4" /> Content idea</span>}
-                    {(s.template || s.templateLink) && <span className="flex items-center gap-1"><LayoutTemplate className="w-4 h-4" /> {s.template?.name || 'Template link'}</span>}
+                    {(s.tagline || s.captions) && <span className="flex items-center gap-1"><Lightbulb className="w-4 h-4" /> Content idea</span>}
+                    {(s.template || s.usedTemplate) && <span className="flex items-center gap-1"><LayoutTemplate className="w-4 h-4" /> {s.template?.name || s.usedTemplate}</span>}
                     {s.hashtags.length > 0 && <span className="flex items-center gap-1"><Hash className="w-4 h-4" /> {s.hashtags.length} hashtags</span>}
                   </div>
                   <p className="mt-2 text-sm text-gray-500">{s.price > 0 ? `₹${s.price.toLocaleString('en-IN')}` : 'Price not set'} · submitted {s.submittedAt}</p>
